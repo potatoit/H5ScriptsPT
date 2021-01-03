@@ -1,4 +1,11 @@
-﻿/*
+﻿/**
+ * Name: MNS209_pt_IDMInfo
+ * Panel: MNS209/B
+ * Arguments: none
+ * 
+ * This is a script to retrieve the IDM information for the selected output in MNS209
+ * This will leverage the IONAPIs to query IDM Distribution Jobs
+ * 
 */
 
 class MNS209_pt_IDMInfo {
@@ -15,7 +22,7 @@ class MNS209_pt_IDMInfo {
 	private gDetailButtonTitle = "IDM Status";
 	private gDetailButtonID = "MNS209_pt_IDMInfo_IDM_Status";
 
-	private gIONAPIUrl;
+	//private gIONAPIUrl;
 
 	constructor(args: IScriptArgs) {
 		this.gController = args.controller;
@@ -28,14 +35,7 @@ class MNS209_pt_IDMInfo {
 	}
 
 	private run(): void {
-		this.gIONAPIUrl = ScriptUtil.GetUserContext().IonApiUrl;
-		if (this.gIONAPIUrl) {
 			this.addControls();
-		}
-		else {
-			// we should show an error dialog here!
-		}
-
 	}
 
 	private getJSONFromIDM(aGUID, aState) {
@@ -61,6 +61,7 @@ class MNS209_pt_IDMInfo {
 				}
 			}
 			IonApiService.Current.execute(request).then((response: IonApiResponse) => {
+				// allow the text to be selectable so we can copy and paste it
 				let message = "<style>.text {  -moz-user-select: text;  -webkit-user-select: text;  -ms-user-select: text;  user-select: text;}</style>";
 
 				if (response.data && response.data.items && response.data.items.item && response.data.items.item.length > 0) {
@@ -148,6 +149,7 @@ class MNS209_pt_IDMInfo {
 							message += `<div class="row">${targetMessage}</div>`;
 						}
 
+						// this is the anchor for the details we will retrieve
 						message += `<div id="${aGUID}">Loading...</div>`;
 						message += '</div>';
 
@@ -222,6 +224,7 @@ class MNS209_pt_IDMInfo {
 		this.getJSONFromIDM(guid, 0);
 	}
 
+	// retrieve the actual data sent, this could be an XML file, or or could be csv
 	public getFile(aPID, aContent): void {
 		let request: IonApiRequest = {
 			url: `/IDM/api/items/${aPID}/resource/stream/`,
@@ -247,9 +250,9 @@ class MNS209_pt_IDMInfo {
 						if (indata.input && indata.input.length > 0 && indata.input[0] && indata.input[0].data && indata.input[0].data.base64) {
 							decodedBody = atob(indata.input[0].data.base64);
 						}
-						message += `<h2>Priorites</h2>`;
-						//debugger;
+						
 						if (indata.input && indata.input[0].template && indata.input[0].template.priority && indata.input[0].template.priority.length > 0) {
+							message += `<h2>Priorites</h2>`;
 							for (let i = 0; i < indata.input[0].template.priority.length; i++) {
 								let currentTemplate = indata.input[0].template.priority[i];
 								if (currentTemplate.type === "xquery") {
@@ -257,6 +260,22 @@ class MNS209_pt_IDMInfo {
 									message += `<div class="row"><div class="twelve columns">${currentTemplate.xquery}</div></div>`;
 								}
 							}
+						}
+						if (indata.input && indata.input[0].csvs && indata.input[0].csvs.length > 0) {
+							for (let i = 0; i < indata.input[0].csvs.length; i++) {
+								let currentTemplate = indata.input[0].csvs[i];
+								if (currentTemplate.type === "data") {
+									decodedBody = atob(indata.input[0].csvs[i].base64);
+									//message += `<div class="row"><div class="twelve columns">${currentTemplate.xquery}</div></div>`;
+								}
+							}
+						}
+						if (indata.input && indata.input[0].sheets && indata.input[0].sheets.length > 0) {
+							message += `<h2>Sheets</h2>`;
+							for (let i = 0; i < indata.input[0].sheets.length; i++) {
+								message += `<div class="row">${indata.input[0].sheets[i]}</div>`;
+							}
+							
 						}
 						if (indata.targets && indata.targets.length > 0) {
 							let targetType = "";
