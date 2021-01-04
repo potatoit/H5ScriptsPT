@@ -8,12 +8,13 @@
  *
 */
 var MNS209_pt_IDMInfo = /** @class */ (function () {
-    //private gIONAPIUrl;
     function MNS209_pt_IDMInfo(args) {
         this.gDetailButtonTop = 6;
         this.gDetailButtonLeft = 40;
         this.gDetailButtonTitle = "IDM Status";
         this.gDetailButtonID = "MNS209_pt_IDMInfo_IDM_Status";
+        //private gIONAPIUrl;
+        this.loadingState = "Loading...";
         this.gController = args.controller;
         this.gDebug = args.log;
         this.gContent = args.controller.GetContentElement();
@@ -29,10 +30,6 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
         var dialogOptions;
         if (aGUID) {
             var state = aState;
-            // /MDS_DistributionJobs[@batchId="004781870646366805"]
-            // BJNO: 004781870646366805
-            // PID: MDS_DistributionJobs-17350-8-LATEST
-            // MDS_DistributionJobs-17350-8-LATEST
             var request = {
                 url: "/IDM/api/items/search/",
                 method: "GET",
@@ -46,7 +43,7 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
             };
             IonApiService.Current.execute(request).then(function (response) {
                 // allow the text to be selectable so we can copy and paste it
-                var message = "<style>.text {  -moz-user-select: text;  -webkit-user-select: text;  -ms-user-select: text;  user-select: text;}</style>";
+                var message = "<div style=\"height: 370px;overflow: auto\"><style>.text {  -moz-user-select: text;  -webkit-user-select: text;  -ms-user-select: text;  user-select: text;font-size: 13px;}</style>";
                 if (response.data && response.data.items && response.data.items.item && response.data.items.item.length > 0) {
                     var _loop_1 = function (i) {
                         var currentItem = response.data.items.item[i];
@@ -117,17 +114,17 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                             message += "<div class=\"row\"><div class=\"four columns\"><b>Status:</b> " + status_1 + "</div><div class=\"four columns\"><b>Phase:</b> " + phase + "</div><div class=\"four columns\"><b>Retries:</b> " + retryCount + "</div></div>";
                             message += "<div class=\"row\"><div class=\"six columns\"><b>Time from submitting:</b> " + timeFromSubmitting + "</div><div class=\"six columns\"><b>Time to complete:</b> " + timeToComplete + "</div></div>";
                             message += "<div class=\"row\"><b>Error Message:</b> " + errorMessage + "</div>";
-                            message += "<div class=\"row\">" + targetMessage + "</div>";
+                            message += "<div class=\"field\">" + targetMessage + "</div>";
                         }
                         // this is the anchor for the details we will retrieve
-                        message += "<div id=\"" + aGUID + "\">Loading...</div>";
-                        message += '</div>';
+                        message += "<div id=\"" + aGUID + "\">" + _this.loadingState + "</div>";
+                        message += '</div></div>';
                         var _mylocal = _this;
                         dialogOptions = {
                             title: "Info",
                             dialogType: "General",
                             modal: true,
-                            width: 600,
+                            minWidth: 600,
                             minHeight: 480,
                             icon: "info",
                             closeOnEscape: true,
@@ -135,7 +132,6 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                                 $(this).remove();
                             },
                             open: function () {
-                                //debugger;
                                 var content = $("#" + aGUID);
                                 _mylocal.getFile(pid, content);
                             },
@@ -206,13 +202,13 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
             var message = "";
             if (response.data) {
                 try {
-                    var indata = response.data; //JSON.parse(response.data);
+                    var indata = response.data;
                     if (indata) {
                         if (indata.input && indata.input.length > 0 && indata.input[0] && indata.input[0].data && indata.input[0].data.base64) {
                             decodedBody = atob(indata.input[0].data.base64);
                         }
                         if (indata.input && indata.input[0].template && indata.input[0].template.priority && indata.input[0].template.priority.length > 0) {
-                            message += "<h2>Priorites</h2>";
+                            message += "<div><h2>Priorites</h2>";
                             for (var i = 0; i < indata.input[0].template.priority.length; i++) {
                                 var currentTemplate = indata.input[0].template.priority[i];
                                 if (currentTemplate.type === "xquery") {
@@ -220,6 +216,7 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                                     message += "<div class=\"row\"><div class=\"twelve columns\">" + currentTemplate.xquery + "</div></div>";
                                 }
                             }
+                            message += "</div>";
                         }
                         if (indata.input && indata.input[0].csvs && indata.input[0].csvs.length > 0) {
                             for (var i = 0; i < indata.input[0].csvs.length; i++) {
@@ -231,14 +228,15 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                             }
                         }
                         if (indata.input && indata.input[0].sheets && indata.input[0].sheets.length > 0) {
-                            message += "<h2>Sheets</h2>";
+                            message += "<div><h2>Sheets</h2>";
                             for (var i = 0; i < indata.input[0].sheets.length; i++) {
                                 message += "<div class=\"row\">" + indata.input[0].sheets[i] + "</div>";
                             }
+                            message += "</div>";
                         }
                         if (indata.targets && indata.targets.length > 0) {
                             var targetType = "";
-                            message += "<h2>Targets</h2>";
+                            message += "<div><h2>Targets</h2>";
                             for (var i = 0; i < indata.targets.length; i++) {
                                 var currentTarget = indata.targets[i];
                                 var currentTargetType = currentTarget.type;
@@ -250,19 +248,19 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                                     var currentTargetBody = currentTarget.body;
                                     var currentTargetFrom = currentTarget.from;
                                     if (currentTargetTo && currentTargetTo.length > 0) {
-                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>To:</b>" + currentTargetTo + "</div></div>";
+                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>To:</b> " + currentTargetTo + "</div></div>";
                                     }
                                     if (currentTargetcc && currentTargetcc.length > 0) {
-                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>CC:</b>" + currentTargetcc + "</div></div>";
+                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>CC:</b> " + currentTargetcc + "</div></div>";
                                     }
                                     if (currentTargetSubject && currentTargetSubject.length > 0) {
-                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>Subject:</b>" + currentTargetSubject + "</div></div>";
+                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>Subject:</b> " + currentTargetSubject + "</div></div>";
                                     }
                                     if (currentTargetBody && currentTargetBody.length > 0) {
-                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>Body:</b>" + currentTargetBody + "</div></div>";
+                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>Body:</b> " + currentTargetBody + "</div></div>";
                                     }
                                     if (currentTargetFrom && currentTargetFrom.length > 0) {
-                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>From:</b>" + currentTargetFrom + "</div></div>";
+                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>From:</b> " + currentTargetFrom + "</div></div>";
                                     }
                                 }
                                 else if (currentTargetType === "print") {
@@ -272,18 +270,18 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                                         message += "<div class=\"row\"><div class=\"twelve columns\"><b>Printer ID:</b> " + currentTargetPrinterID + "</div></div>";
                                     }
                                     if (currentTargetCopies && currentTargetCopies.length > 0) {
-                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>Copies:</b>" + currentTargetCopies + "</div></div>";
+                                        message += "<div class=\"row\"><div class=\"twelve columns\"><b>Copies:</b> " + currentTargetCopies + "</div></div>";
                                     }
                                 }
+                                message += "<br/>";
                             }
+                            message += "</div>";
                         }
-                        message += "<br/><textarea class=\"textarea\" readonly=\"true\" width=\"500px\">" + decodedBody + "</textarea>";
+                        message += "<div class=\"field\" style=\"width: 90%\"><textarea class=\"textarea\" readonly=\"true\" style=\"width: 90%\" >" + decodedBody + "</textarea></div>";
                         if (aContent) {
-                            //aContent.text = "";
-                            //aContent.append(message);
+                            _this.loadingState = "";
                             aContent.html(message);
                         }
-                        //this.displayDialog(message, undefined);
                     }
                 }
                 catch (ex) {
