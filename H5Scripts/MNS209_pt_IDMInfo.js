@@ -45,6 +45,7 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                 // allow the text to be selectable so we can copy and paste it
                 var message = "<div style=\"height: 370px;overflow: auto\"><style>.text {  -moz-user-select: text;  -webkit-user-select: text;  -ms-user-select: text;  user-select: text;font-size: 13px;}</style>";
                 if (response.data && response.data.items && response.data.items.item && response.data.items.item.length > 0) {
+                    var jsonString = JSON.stringify(response.data);
                     var _loop_1 = function (i) {
                         var currentItem = response.data.items.item[i];
                         var createdBy = currentItem.createdByName;
@@ -116,6 +117,7 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                             message += "<div class=\"row\"><b>Error Message:</b> " + errorMessage + "</div>";
                             message += "<div class=\"field\">" + targetMessage + "</div>";
                         }
+                        message += "<br/><h3>IDM JSON</h3><div class=\"field\" style=\"width: 90%\"><textarea class=\"textarea\" readonly=\"true\" style=\"width: 90%; font-size: 12px; height: 40px\" >" + jsonString + "</textarea></div><br/>";
                         // this is the anchor for the details we will retrieve
                         message += "<div id=\"" + aGUID + "\">" + _this.loadingState + "</div>";
                         message += '</div></div>';
@@ -124,7 +126,7 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                             title: "Info",
                             dialogType: "General",
                             modal: true,
-                            minWidth: 600,
+                            minWidth: 500,
                             minHeight: 480,
                             icon: "info",
                             closeOnEscape: true,
@@ -204,6 +206,11 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                 try {
                     var indata = response.data;
                     if (indata) {
+                        var jsonString = "";
+                        try {
+                            jsonString = JSON.stringify(indata);
+                        }
+                        catch (jex) { }
                         if (indata.input && indata.input.length > 0 && indata.input[0] && indata.input[0].data && indata.input[0].data.base64) {
                             decodedBody = atob(indata.input[0].data.base64);
                         }
@@ -277,7 +284,10 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                             }
                             message += "</div>";
                         }
-                        message += "<div class=\"field\" style=\"width: 90%\"><textarea class=\"textarea\" readonly=\"true\" style=\"width: 90%\" >" + decodedBody + "</textarea></div>";
+                        if (jsonString && jsonString.length > 0) {
+                            message += "<br/><h3>Resource JSON</h3><div class=\"field\" style=\"width: 90%\"><textarea class=\"textarea\" readonly=\"true\" style=\"width: 90%; font-size: 12px; height: 40px\" >" + jsonString + "</textarea></div><br/>";
+                        }
+                        message += "<h3>Resource Decoded Body</h3><div class=\"field\" style=\"width: 90%\"><textarea class=\"textarea\" readonly=\"true\" style=\"width: 90%; font-size: 12px; height: 40px\" >" + decodedBody + "</textarea></div>";
                         if (aContent) {
                             _this.loadingState = "";
                             aContent.html(message);

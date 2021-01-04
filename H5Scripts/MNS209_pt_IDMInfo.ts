@@ -61,6 +61,7 @@ class MNS209_pt_IDMInfo {
 				let message = `<div style="height: 370px;overflow: auto"><style>.text {  -moz-user-select: text;  -webkit-user-select: text;  -ms-user-select: text;  user-select: text;font-size: 13px;}</style>`;
 
 				if (response.data && response.data.items && response.data.items.item && response.data.items.item.length > 0) {
+					let jsonString = JSON.stringify(response.data);
 					for (let i = 0; i < response.data.items.item.length; i++) {
 						let currentItem = response.data.items.item[i];
 
@@ -145,6 +146,8 @@ class MNS209_pt_IDMInfo {
 							message += `<div class="field">${targetMessage}</div>`;
 						}
 
+						message += `<br/><h3>IDM JSON</h3><div class="field" style="width: 90%"><textarea class="textarea" readonly="true" style="width: 90%; font-size: 12px; height: 40px" >${jsonString}</textarea></div><br/>`;
+
 						// this is the anchor for the details we will retrieve
 						message += `<div id="${aGUID}">${this.loadingState}</div>`;
 						message += '</div></div>';
@@ -155,7 +158,7 @@ class MNS209_pt_IDMInfo {
 							title: "Info",
 							dialogType: "General",
 							modal: true,
-							minWidth: 600,
+							minWidth: 500,
 							minHeight: 480,
 							icon: "info",
 							closeOnEscape: true,
@@ -242,6 +245,12 @@ class MNS209_pt_IDMInfo {
 					let indata = response.data;
 
 					if (indata) {
+						let jsonString = "";
+						try {
+							jsonString = JSON.stringify(indata);
+						}
+						catch (jex) {}
+						
 						if (indata.input && indata.input.length > 0 && indata.input[0] && indata.input[0].data && indata.input[0].data.base64) {
 							decodedBody = atob(indata.input[0].data.base64);
 						}
@@ -321,7 +330,12 @@ class MNS209_pt_IDMInfo {
 							message += `</div>`;
 						}
 
-						message += `<div class="field" style="width: 90%"><textarea class="textarea" readonly="true" style="width: 90%" >${decodedBody}</textarea></div>`;
+						if (jsonString && jsonString.length > 0) {
+							message += `<br/><h3>Resource JSON</h3><div class="field" style="width: 90%"><textarea class="textarea" readonly="true" style="width: 90%; font-size: 12px; height: 40px" >${jsonString}</textarea></div><br/>`;
+						}
+						
+
+						message += `<h3>Resource Decoded Body</h3><div class="field" style="width: 90%"><textarea class="textarea" readonly="true" style="width: 90%; font-size: 12px; height: 40px" >${decodedBody}</textarea></div>`;
 
 						if (aContent) {
 							this.loadingState = "";
