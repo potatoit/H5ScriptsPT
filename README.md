@@ -6,7 +6,9 @@ This project is for a collection of useful tools to make life a little easier.
 
 ## MNS209_pt_IDMInfo
 This script is attached to MNS209 and can be used to help troubleshooting or interrorgating IDM for outputs.
-Attach the script tp the MNS209/B panel
+Attach the script to the MNS209/B panel
+
+See https://potatoit.kiwi/2021/01/05/mns209-getting-data-from-idm/ for more information
 
 
 # Disclaimer
