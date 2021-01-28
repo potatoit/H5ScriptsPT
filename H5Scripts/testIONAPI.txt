@@ -1,0 +1,29 @@
+/**
+ * Name: testIONAPI
+ * Panel: any
+ * Arguments: none
+ *
+ * Curent the that  IonApiService.Current exists
+ *
+*/
+var testIONAPI = /** @class */ (function () {
+    function testIONAPI(args) {
+        this.gController = args.controller;
+        this.gDebug = args.log;
+        this.gContent = args.controller.GetContentElement();
+    }
+    testIONAPI.Init = function (args) {
+        new testIONAPI(args).run();
+    };
+    testIONAPI.prototype.run = function () {
+        debugger;
+        if (IonApiService.Current) {
+            this.gDebug.Info("IonApi is set");
+        }
+        else {
+            this.gDebug.Error("IonApi not set");
+        }
+    };
+    return testIONAPI;
+}());
+//# sourceMappingURL=testIONAPI.js.map

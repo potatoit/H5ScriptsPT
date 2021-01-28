@@ -2,7 +2,8 @@
     "compilerOptions": {
         "target": "es5",
         "sourceMap": true,
-        "watch": true
+        "watch": true,
+        "outDir": "../output"
     },
     "exclude": [
         "../Nodejs/node_modules"

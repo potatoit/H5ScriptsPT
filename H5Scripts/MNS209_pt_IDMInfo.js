@@ -13,11 +13,16 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
         this.gDetailButtonLeft = 40;
         this.gDetailButtonTitle = "IDM Status";
         this.gDetailButtonID = "MNS209_pt_IDMInfo_IDM_Status";
-        //private gIONAPIUrl;
         this.loadingState = "Loading...";
         this.gController = args.controller;
         this.gDebug = args.log;
         this.gContent = args.controller.GetContentElement();
+        if (ScriptUtil.version >= 2.0) {
+            this.gionapiService = IonApiService;
+        }
+        else {
+            this.gionapiService = IonApiService.Current;
+        }
     }
     MNS209_pt_IDMInfo.Init = function (args) {
         new MNS209_pt_IDMInfo(args).run();
@@ -41,7 +46,7 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                     $includeCount: true
                 }
             };
-            IonApiService.Current.execute(request).then(function (response) {
+            this.gionapiService.execute(request).then(function (response) {
                 // allow the text to be selectable so we can copy and paste it
                 var message = "<div style=\"height: 370px;overflow: auto\"><style>.text {  -moz-user-select: text;  -webkit-user-select: text;  -ms-user-select: text;  user-select: text;font-size: 13px;}</style>";
                 if (response.data && response.data.items && response.data.items.item && response.data.items.item.length > 0) {
@@ -198,7 +203,7 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                 $webdav: "false"
             }
         };
-        IonApiService.Current.execute(request).then(function (response) {
+        this.gionapiService.execute(request).then(function (response) {
             var priorityData = [];
             var decodedBody = "";
             var message = "";
@@ -306,6 +311,7 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
         });
     };
     MNS209_pt_IDMInfo.prototype.displayDialog = function (aDialogContent, aDialogOptions) {
+        debugger;
         if (!aDialogOptions) {
             aDialogOptions = {
                 title: "Info",
@@ -326,7 +332,8 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
             };
         }
         if (ScriptUtil.version >= 2.0) {
-            H5ControlUtil.H5Dialog.CreateDialogElement(aDialogContent[0], aDialogOptions);
+            var content = $(aDialogContent);
+            H5ControlUtil.H5Dialog.CreateDialogElement(content[0], aDialogOptions);
         }
         else {
             $('<div>' + aDialogContent + '</div>').inforMessageDialog(aDialogOptions);

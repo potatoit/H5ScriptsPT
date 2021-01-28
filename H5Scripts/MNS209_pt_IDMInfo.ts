@@ -22,13 +22,21 @@ class MNS209_pt_IDMInfo {
 	private gDetailButtonTitle = "IDM Status";
 	private gDetailButtonID = "MNS209_pt_IDMInfo_IDM_Status";
 
-	//private gIONAPIUrl;
+	private gionapiService : any;
 	private loadingState = "Loading...";
 
 	constructor(args: IScriptArgs) {
 		this.gController = args.controller;
 		this.gDebug = args.log;
 		this.gContent = args.controller.GetContentElement();
+
+
+		if (ScriptUtil.version >= 2.0) {
+			this.gionapiService = IonApiService;
+		}
+		else {
+			this.gionapiService = IonApiService.Current;
+		}
 	}
 
 	private static Init(args: IScriptArgs) {
@@ -56,7 +64,7 @@ class MNS209_pt_IDMInfo {
 					$includeCount: true
 				}
 			}
-			IonApiService.Current.execute(request).then((response: IonApiResponse) => {
+			this.gionapiService.execute(request).then((response: IonApiResponse) => {
 				// allow the text to be selectable so we can copy and paste it
 				let message = `<div style="height: 370px;overflow: auto"><style>.text {  -moz-user-select: text;  -webkit-user-select: text;  -ms-user-select: text;  user-select: text;font-size: 13px;}</style>`;
 
@@ -233,7 +241,7 @@ class MNS209_pt_IDMInfo {
 			}
 
 		}
-		IonApiService.Current.execute(request).then((response: IonApiResponse) => {
+		this.gionapiService.execute(request).then((response: IonApiResponse) => {
 			let priorityData: string[] = [];
 			let decodedBody = "";
 
@@ -359,6 +367,7 @@ class MNS209_pt_IDMInfo {
 
 
 	private displayDialog(aDialogContent, aDialogOptions) {
+		debugger;
 		if (!aDialogOptions) {
 			aDialogOptions = {
 				title: "Info",
@@ -382,7 +391,8 @@ class MNS209_pt_IDMInfo {
 		}
 
 		if (ScriptUtil.version >= 2.0) {
-			H5ControlUtil.H5Dialog.CreateDialogElement(aDialogContent[0], aDialogOptions);
+			let content = $(aDialogContent);
+			H5ControlUtil.H5Dialog.CreateDialogElement(content[0], aDialogOptions);
 		}
 		else {
 			$('<div>' + aDialogContent + '</div>').inforMessageDialog(aDialogOptions);
