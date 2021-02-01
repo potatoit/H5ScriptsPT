@@ -174,10 +174,6 @@ class MNS209_pt_IDMInfo {
 								$(this).remove();
 							}
 							,
-							open: function () {
-								let content = $("#" + aGUID);
-								_mylocal.getFile(pid, content);
-							},
 							buttons: [{
 								text: "OK",
 								isDefault: true,
@@ -192,8 +188,20 @@ class MNS209_pt_IDMInfo {
 							}
 							]
 						};
-
-
+						if (ScriptUtil.version >= 2.0) {
+							
+							dialogOptions.afterOpen = function () {
+								debugger;
+								let content = $("#" + aGUID);
+								_mylocal.getFile(pid, content);
+							};
+						}
+						else {
+							dialogOptions.open = function () {
+								let content = $("#" + aGUID);
+								_mylocal.getFile(pid, content);
+							};
+                        }
 					}
 					this.displayDialog(message, dialogOptions);
 					if (this.gController.ShowMessageInStatusBar) {
@@ -367,7 +375,7 @@ class MNS209_pt_IDMInfo {
 
 
 	private displayDialog(aDialogContent, aDialogOptions) {
-		debugger;
+		
 		if (!aDialogOptions) {
 			aDialogOptions = {
 				title: "Info",

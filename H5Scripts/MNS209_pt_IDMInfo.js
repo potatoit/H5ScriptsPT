@@ -138,10 +138,6 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                             close: function () {
                                 $(this).remove();
                             },
-                            open: function () {
-                                var content = $("#" + aGUID);
-                                _mylocal.getFile(pid, content);
-                            },
                             buttons: [{
                                     text: "OK",
                                     isDefault: true,
@@ -157,6 +153,19 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
                                 }
                             ]
                         };
+                        if (ScriptUtil.version >= 2.0) {
+                            dialogOptions.afterOpen = function () {
+                                debugger;
+                                var content = $("#" + aGUID);
+                                _mylocal.getFile(pid, content);
+                            };
+                        }
+                        else {
+                            dialogOptions.open = function () {
+                                var content = $("#" + aGUID);
+                                _mylocal.getFile(pid, content);
+                            };
+                        }
                     };
                     for (var i = 0; i < response.data.items.item.length; i++) {
                         _loop_1(i);
@@ -311,7 +320,6 @@ var MNS209_pt_IDMInfo = /** @class */ (function () {
         });
     };
     MNS209_pt_IDMInfo.prototype.displayDialog = function (aDialogContent, aDialogOptions) {
-        debugger;
         if (!aDialogOptions) {
             aDialogOptions = {
                 title: "Info",
